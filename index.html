@@ -1,0 +1,157 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>Ajax and Jquery testing file (for sporks)</title>
+
+<link rel="stylesheet" type="text/css" href="http://static.zoovy.com/graphics/general/jslib/jquery/jqueryui_themes/ui-cupertino-1.8.16/jquery-ui-1.8.16.custom.css" />
+
+<script type='text/javascript'>
+var myControl;
+</script>
+
+<script type="text/javascript" src="http://static.zoovy.com/graphics/general/jslib/jquery/jquery-1.6.4.min.js"></script>
+<script type="text/javascript" src="http://static.zoovy.com/graphics/general/jslib/jquery/jqueryui-1.8.16/js/jquery-ui.min.js"></script>
+
+
+<script type="text/javascript" src="http://static.zoovy.com/graphics/general/jslib/zmvc/201205/model.js"></script>
+<script type="text/javascript" src="http://static.zoovy.com/graphics/general/jslib/zmvc/201205/controller.js"></script>
+<script type="text/javascript" src="http://static.zoovy.com/graphics/general/jslib/zmvc/201205/json2.js"></script>
+
+
+<script type="text/javascript" src="http://myownersbox.zoovy.com/jquery/config.js?MVC=20120121073500"></script>
+
+
+
+
+
+<!--
+<script src="//connect.facebook.net/en_US/all.js" type="text/javascript"></script>
+-->
+<script type="text/javascript">
+
+// !!! full path required for extension filename when viewing on a server. relative path works fine for local.
+
+var myExtensions = [
+	{"namespace":"store_prodlist","filename":"http://static.zoovy.com/graphics/general/jslib/zmvc/201205/extensions/store_prodlist.js"},
+	{"namespace":"store_navcats","filename":"http://static.zoovy.com/graphics/general/jslib/zmvc/201205/extensions/store_navcats.js"},
+	{"namespace":"simple_sample","filename":"http://static.zoovy.com/graphics/general/jslib/zmvc/201205/extensions/simple_sample.js","callback":"startMyProgram"}
+	];
+
+$(function() {
+	myControl = new zController({
+		"username":"highpointscientific",
+		"sdomain":"highpointscientific.com",
+		"sessionId" : "ix2LwR9HZt3Wk8DVa9LxXHEaM",
+		"jqurl":"http://www.highpointscientific.com/jquery/", //could be changed to zoovy.com/webapi...
+		"release":"20120124045500", //increment this with each change. should solve caching issues.
+		"secureURL" : "https://secure.highpointscientific.com/" //will change based on whether or not user has ssl cert. end with a slash.
+		},myExtensions);  //instantiate controller. handles all logic and communication between model and view.
+	});
+
+</script>
+
+
+
+
+</head>
+
+<body style='padding:10px; font-family:Arial, Helvetica, sans-serif; color:#333333; font-size:11px;'>
+
+
+<!-- used for any 'global' errors, such as incompatible system settings, high level errors and also for request/response errors. -->
+<div id='globalMessaging' class='displayNone'></div>
+
+
+<!-- some very simple html, used for positioning elements -->
+<div align='center'>
+<form>
+	<input type='text' name='keywords' id='headerKeywordsInput' value='' />
+	<button onClick=''>Search</button>
+</form>
+</div>
+<table width='100%'>
+<tr>
+	<td id='leftCol' width='25%'>
+	
+	</td>
+	<td id='mainCol' width='25%'>
+	
+	</td>
+</tr>
+</table>
+
+
+
+
+
+
+
+
+
+<div id='templates'>
+
+<!--
+the following templates will get added to the myControl.templates object.
+What templates are used need to be declared in the extension.
+each template should only be declared once.
+the default extensions (store_prodlist, store_navcats, etc) do NOT load templates. include any templates you want in your own extension.
+
+avoid using any 'id=' within a template if it is going to be repeated on the page (a product or category template, for instance).
+
+for products, an id is added to the template of parentID_PID and a data-pid='PID' where PID = product id and parentID is a var passed in to the template.
+
+similarly, categories get an id of parentID_catsafeid (with periods removed) and a data-catsafeid='.cat.safe.id'
+
+NOTE - for 'lists', if you don't have a UL or OL around the LI in the view (this file) IE gets upset and duplicates every template twice.
+note a huge deal since the OL or UL makes it html compliant.
+-->
+
+<ul>
+<!-- this is a very simple product list template -->
+<li id='productTemplate'>
+	<img class='prodThumb' data-bind='var: product(zoovy:prod_image1); format:imageURL;' />
+	<div class='prodName' data-bind='var: product(zoovy:prod_name); format:text; defaultVar: description;'></div>
+	<div class='ztable_row_small stid' data-bind='var: product(pid); format:text; className: stid; pretext: Sku: ;'></div>
+	<div data-bind='var: product(zoovy:base_price); format:money; currencySign: $;  hideZero:true;'></div>
+</li>
+</ul>
+
+
+<ul>
+<!--a sample category template. add an onclick to the li to add an action. -->
+	<li id='categoryTemplate'><span data-bind='var: category(pretty); format:text;'></span></li>
+</ul>
+
+<ul>
+<!-- a sample category template. -->
+<li id='categoryThumbTemplate'>
+	<img class='prodThumb' data-bind='var: category(%meta.CAT_THUMB); format:imageURL;'  />
+	<div class='prodName' data-bind='var: category(pretty); format:text;'></div>
+</li>
+</ul>
+
+
+<!-- a template for multipage controls -->
+<div id='mpControlSpec'>
+	<div class='mpControls'>
+
+		<ul class='mpControlPages floatRight' data-bind='var:prodlistmeta(total_page_count); format:mpPagesAsListItems; extension:store_prodlist;'></ul>
+
+		<span data-bind='var:prodlistmeta(items_on_this_page); format:text; pretext:Showing ;'></span>
+		<span data-bind='var:prodlistmeta(total_product_count); format:text; pretext: of ;'></span> Items ( page  
+		<span data-bind='var:prodlistmeta(page_in_focus); format:text;'></span> of <span data-bind='var:prodlistmeta(total_page_count); format:text;'></span>: 
+		#<span data-bind='var:prodlistmeta(page_start_point); format:text;'></span> - 
+		#<span data-bind='var:prodlistmeta(page_end_point); format:text;'></span> )
+		
+	</div>
+</div>
+
+
+
+</div>
+
+
+
+</body>
+</html>
